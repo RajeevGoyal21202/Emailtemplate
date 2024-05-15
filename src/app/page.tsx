@@ -1,95 +1,53 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
+"use client"
+import { Button, Card, CardContent, CardHeader, Stack, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import axios from "axios"
 export default function Home() {
+  const [buttonDisabled,setButtonDisabled]= useState(false)
+  const [loading,setLoading]= useState(false) 
+  const [email,setEmail] = useState({
+    sender:"",
+    reciever:"",
+    subject:"",
+    body:""
+    
+  })
+  async function handleSubmit(event:any) {
+    event.preventDefault();
+    try {
+      console.log(email)
+      setLoading(true);
+      const response = await axios.post("/api/mail", email);
+      console.log("Email Send successfully", response.data);
+     
+  } catch (error:any) {
+      console.log("Signup failed", error.message);
+      
+      
+  }finally {
+      setLoading(false);
+  }
+  };
+  useEffect(() => {
+    if( email.reciever.length > 0 && email.body.length > 0 && email.subject.length>0) {
+        setButtonDisabled(false); 
+    } else {
+        setButtonDisabled(true);
+    }
+}, [email]);
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <Stack sx={{width:"100%", height:"100vh",alignItems:"center",justifyContent:"center"}}>
+      <Card sx={{width:"500px"}}>
+        <CardHeader title= "Email Template"/>
+        <CardContent>
+          <Stack gap={"10px"}>
+          <TextField placeholder="Reciever Email" value={email.reciever} type="email" required onChange={(e)=>{setEmail({...email,reciever:e.target.value})}}/>
+          <TextField placeholder="Subject" value={email.subject} required onChange={(e)=>{setEmail({...email,subject:e.target.value})}}/>
+          <TextField placeholder="Please enter your good name" size="medium" value={email.body} required onChange={(e)=>{setEmail({...email,body:e.target.value})}}/>
+          <Button type='submit' variant='contained' disabled={buttonDisabled}  onClick={handleSubmit}>{loading? "Loading....":"Signup" }</Button>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Stack>
   );
 }
